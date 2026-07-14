@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incidencias de Proveedores | Antigravity WMS</title>
+    <link rel="stylesheet" href="/INCIDENCIAS/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <!-- SIDEBAR DE NAVEGACIÓN -->
+    <div class="sidebar" id="sidebarMenu">
+        <div class="sidebar-brand">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Módulos</span>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="/index.html"><i class="fa-solid fa-home"></i> Centro de Control</a>
+            <hr style="border: 0.5px solid #2a3b5c; margin: 10px 0;">
+            <a href="/AVANCE/index.html"><i class="fa-solid fa-chart-line"></i> Dashboard Recepción</a>
+            <a href="/PRODUCTIVIDAD/index.html"><i class="fa-solid fa-boxes-packing"></i> Dashboard Productividad</a>
+            <a href="/AGENDA/index.html"><i class="fa-solid fa-calendar-days"></i> Dashboard Agenda</a>
+            <a href="#" class="active"><i class="fa-solid fa-triangle-exclamation"></i> Dashboard Incidencias</a>
+            <a href="/COMPROMISO/index.html"><i class="fa-solid fa-file-signature"></i> Dashboard Carta de
+                Compromiso</a>
+        </nav>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="main-content" id="mainContent">
+
+        <!-- CABECERA CON FILTROS GLOBALES -->
+        <header class="main-header">
+            <div class="header-left">
+                <button id="btn-toggle-sidebar" class="btn-toggle"><i class="fa-solid fa-bars"></i></button>
+                <div class="brand">
+                    <h1>DETALLE DE INCIDENCIAS PROVEEDORES</h1>
+                    <p>CEDIS | Control de Atrasos y Penalizaciones en Tiempo Real</p>
+                </div>
+            </div>
+
+            <!-- FILTROS DE CABECERA -->
+            <div class="filter-bar">
+                <div class="dropdown-container">
+                    <button class="dropdown-btn" onclick="toggleDropdownMenu('drop-anio', event)">Año <i
+                            class="fa-solid fa-chevron-down"></i></button>
+                    <div id="drop-anio" class="dropdown-content-list">
+                        <button class="btn-toggle-all" id="btn-toggle-anio"
+                            onclick="alternarSeleccionRapida('chk-anio', 'btn-toggle-anio')">Desmarcar todo</button>
+                        <div class="checkbox-list" id="header-anio-content"></div>
+                    </div>
+                </div>
+
+                <div class="dropdown-container">
+                    <button class="dropdown-btn" onclick="toggleDropdownMenu('drop-mes', event)">Mes <i
+                            class="fa-solid fa-chevron-down"></i></button>
+                    <div id="drop-mes" class="dropdown-content-list">
+                        <button class="btn-toggle-all" id="btn-toggle-mes"
+                            onclick="alternarSeleccionRapida('chk-mes', 'btn-toggle-mes')">Desmarcar todo</button>
+                        <div class="checkbox-list" id="header-mes-content"></div>
+                    </div>
+                </div>
+
+                <div class="dropdown-container">
+                    <button class="dropdown-btn" onclick="toggleDropdownMenu('drop-semana', event)">Semana del Mes <i
+                            class="fa-solid fa-chevron-down"></i></button>
+                    <div id="drop-semana" class="dropdown-content-list">
+                        <button class="btn-toggle-all" id="btn-toggle-semana"
+                            onclick="alternarSeleccionRapida('chk-semana', 'btn-toggle-semana')">Desmarcar todo</button>
+                        <div class="checkbox-list" id="header-semana-content">
+                            <label><input type="checkbox" value="1" class="chk-semana" checked
+                                    onchange="ejecutarFiltrosInternos()"> Semana 1</label>
+                            <label><input type="checkbox" value="2" class="chk-semana" checked
+                                    onchange="ejecutarFiltrosInternos()"> Semana 2</label>
+                            <label><input type="checkbox" value="3" class="chk-semana" checked
+                                    onchange="ejecutarFiltrosInternos()"> Semana 3</label>
+                            <label><input type="checkbox" value="4" class="chk-semana" checked
+                                    onchange="ejecutarFiltrosInternos()"> Semana 4</label>
+                            <label><input type="checkbox" value="5" class="chk-semana" checked
+                                    onchange="ejecutarFiltrosInternos()"> Semana 5</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- INDICADORES CLAVE (KPIs) -->
+        <section class="kpi-row">
+            <div class="card-kpi">
+                <span class="kpi-val" id="kpi-incidencias">0</span>
+                <span class="kpi-label"><i class="fa-solid fa-triangle-exclamation"></i> Total Incidencias</span>
+            </div>
+            <div class="card-kpi">
+                <span class="kpi-val" id="kpi-proveedores">0</span>
+                <span class="kpi-label"><i class="fa-solid fa-truck"></i> Total Proveedores</span>
+            </div>
+            <div class="card-kpi">
+                <span class="kpi-val" id="kpi-atraso">0.0h</span>
+                <span class="kpi-label"><i class="fa-solid fa-clock"></i> Total Horas Atraso</span>
+            </div>
+            <div class="card-kpi">
+                <span class="kpi-val" id="kpi-perdidas">0.0h</span>
+                <span class="kpi-label"><i class="fa-solid fa-hourglass-half"></i> Horas Perdidas</span>
+            </div>
+            <div class="card-kpi critical-kpi">
+                <span class="kpi-val" id="kpi-confiabilidad">100%</span>
+                <span class="kpi-label"><i class="fa-solid fa-shield-check"></i> Confiabilidad (OTIF)</span>
+            </div>
+        </section>
+
+        <!-- GRÁFICOS PARALELOS CON EXPANSIÓN LATERAL -->
+        <section class="charts-row-triple" id="chartsContainer">
+            <div class="chart-box content-resizable" id="box-temporal">
+                <div class="chart-header">
+                    <h3>Evolución Temporal de Incidencias</h3>
+                    <button class="btn-expand-chart" onclick="toggleExpandirGraficoTemporal()"
+                        title="Expandir a los costados">
+                        <i class="fa-solid fa-expand" id="icon-expand"></i>
+                    </button>
+                </div>
+                <div class="canvas-holder">
+                    <canvas id="chart-evolucion-temporal"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-box content-resizable" id="box-proveedores">
+                <div class="chart-header">
+                    <h3>Top Proveedores con Incidencias</h3>
+                </div>
+                <div class="canvas-holder">
+                    <canvas id="chart-top-proveedores"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-box content-resizable" id="box-tipo">
+                <div class="chart-header">
+                    <h3>Incidencias por Tipo</h3>
+                </div>
+                <div class="canvas-holder">
+                    <canvas id="chart-incidencias-tipo"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE LA TABLA -->
+        <section class="table-section">
+            <div class="table-title">
+                <div class="title-left">
+                    <h3>Registros Históricos de la Base de Datos</h3>
+                    <button id="btn-clear-filters" class="btn-clear" onclick="resetearFiltros()"><i
+                            class="fa-solid fa-filter-circle-xmark"></i> Limpiar Filtros e Interactividad</button>
+                </div>
+                <span class="counter-badge" id="table-counter">0 / 0 Registros</span>
+            </div>
+
+            <div class="table-overflow">
+                <table id="data-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="header-cell-interactive">
+                                    <span>Fecha (Mes)</span>
+                                    <button class="btn-trigger-popover"
+                                        onclick="togglePopoverFiltro('pop-fecha', event)"><i
+                                            class="fa-solid fa-calendar-days"></i></button>
+                                    <div id="pop-fecha" class="popover-filter-menu" onclick="event.stopPropagation()">
+                                        <button class="btn-toggle-all" id="btn-pop-fecha"
+                                            onclick="alternarListaFiltroTabla('chk-pop-mes-tabla', 'btn-pop-fecha')">Desmarcar
+                                            todo</button>
+                                        <div class="checkbox-list-popover" id="list-popover-meses-tabla">
+                                            <!-- Inyección dinámica de los 12 meses -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="header-cell-interactive">
+                                    <span>Proveedor</span>
+                                    <button class="btn-trigger-popover"
+                                        onclick="togglePopoverFiltro('pop-prov', event)"><i
+                                            class="fa-solid fa-magnifying-glass"></i></button>
+                                    <div id="pop-prov" class="popover-filter-menu" onclick="event.stopPropagation()">
+                                        <input type="text" id="input-search-prov" placeholder="Buscar proveedor..."
+                                            oninput="ejecutarFiltrosInternos()">
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="header-cell-interactive">
+                                    <span>Tipo</span>
+                                    <button class="btn-trigger-popover"
+                                        onclick="togglePopoverFiltro('pop-tipo', event)"><i
+                                            class="fa-solid fa-filter"></i></button>
+                                    <div id="pop-tipo" class="popover-filter-menu" onclick="event.stopPropagation()">
+                                        <button class="btn-toggle-all" id="btn-pop-tipo"
+                                            onclick="alternarListaFiltroTabla('chk-pop-tipo', 'btn-pop-tipo')">Desmarcar
+                                            todo</button>
+                                        <div class="checkbox-list-popover" id="list-popover-tipo"></div>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="header-cell-interactive">
+                                    <span>Motivo</span>
+                                    <button class="btn-trigger-popover"
+                                        onclick="togglePopoverFiltro('pop-motivo', event)"><i
+                                            class="fa-solid fa-filter"></i></button>
+                                    <div id="pop-motivo" class="popover-filter-menu" onclick="event.stopPropagation()">
+                                        <button class="btn-toggle-all" id="btn-pop-motivo"
+                                            onclick="alternarListaFiltroTabla('chk-pop-motivo', 'btn-pop-motivo')">Desmarcar
+                                            todo</button>
+                                        <div class="checkbox-list-popover" id="list-popover-motivo"></div>
+                                    </div>
+                                </div>
+                            </th>
+                            <th onclick="alternarOrdenAtraso()" style="cursor: pointer;">
+                                <div class="header-cell-interactive justify-center">
+                                    <span>Hora Atraso <i class="fa-solid fa-sort"></i></span>
+                                </div>
+                            </th>
+                            <th onclick="alternarOrdenPerdida()" style="cursor: pointer;">
+                                <div class="header-cell-interactive justify-center">
+                                    <span>Hora Perdida <i class="fa-solid fa-sort"></i></span>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr>
+                            <td colspan="6" class="loading-td" id="status-message">Conectando y sincronizando con
+                                Supabase...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script src="/INCIDENCIAS/app.js"></script>
+</body>
+
+</html>
