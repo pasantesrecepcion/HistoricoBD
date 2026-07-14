@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity WMS | Centro de Control</title>
+    <link rel="stylesheet" href="centro_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="sidebar" id="sidebarMenu">
+        <div class="sidebar-brand">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Antigravity WMS</span>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="index.html" class="active"><i class="fa-solid fa-home"></i> Centro de Control</a>
+            <hr style="border: 0.5px solid #2a3b5c; margin: 10px 0;">
+            <a href="AVANCE/index.html"><i class="fa-solid fa-chart-line"></i> Dashboard Recepción</a>
+            <a href="PRODUCTIVIDAD/index.html"><i class="fa-solid fa-boxes-packing"></i> Dashboard Productividad</a>
+            <a href="AGENDA/index.html"><i class="fa-solid fa-calendar-days"></i> Dashboard Agenda</a>
+            <a href="INCIDENCIAS/index.html"><i class="fa-solid fa-triangle-exclamation"></i> Dashboard Incidencias</a>
+            <a href="COMPROMISO/index.html"><i class="fa-solid fa-file-signature"></i> Dashboard Carta de Compromiso</a>
+        </nav>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <header class="main-header">
+            <div class="header-left">
+                <button id="btn-toggle-sidebar" class="btn-toggle"><i class="fa-solid fa-bars"></i></button>
+                <div class="brand">
+                    <h1>PANEL CENTRAL DE CONTROL</h1>
+                    <p>CEDIS LOGÍSTICA | Acceso rápido a las operaciones activas</p>
+                </div>
+            </div>
+        </header>
+
+        <section class="portal-container">
+            <h2>Seleccione un módulo de trabajo</h2>
+            <div class="portal-grid">
+
+                <a href="AVANCE/index.html" class="portal-card">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <h3>Recepción</h3>
+                    <p>Detalles de ingresos y Control de ASN</p>
+                </a>
+
+                <a href="PRODUCTIVIDAD/index.html" class="portal-card">
+                    <i class="fa-solid fa-boxes-packing"></i>
+                    <h3>Productividad</h3>
+                    <p>Eficiencia y avance de operarios en WMS</p>
+                </a>
+
+                <a href="AGENDA/index.html" class="portal-card">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <h3>Agenda</h3>
+                    <p>Calendario, planificaciones y citas de carga</p>
+                </a>
+
+                <a href="INCIDENCIAS/index.html" class="portal-card">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <h3>Incidencias</h3>
+                    <p>Registro de novedades y alertas operativas</p>
+                </a>
+
+                <a href="COMPROMISO/index.html" class="portal-card">
+                    <i class="fa-solid fa-file-signature"></i>
+                    <h3>Carta de Compromiso</h3>
+                    <p>Seguimiento de convenios y acuerdos logísticos</p>
+                </a>
+
+            </div>
+        </section>
+    </div>
+
+    <script src="centro_app.js"></script>
+</body>
+
+</html>
