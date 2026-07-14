@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda de RECEPCION | Antigravity WMS</title>
+    <link rel="stylesheet" href="/AGENDA/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <div class="sidebar" id="sidebarMenu">
+        <div class="sidebar-brand">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Módulos</span>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="/index.html"><i class="fa-solid fa-home"></i> Centro de Control</a>
+            <hr style="border: 0.5px solid #2a3b5c; margin: 10px 0;">
+            <a href="/AVANCE/index.html"><i class="fa-solid fa-chart-line"></i> Dashboard Recepción</a>
+            <a href="/PRODUCTIVIDAD/index.html"><i class="fa-solid fa-boxes-packing"></i> Dashboard Productividad</a>
+            <a href="#" class="active"><i class="fa-solid fa-calendar-days"></i> Dashboard Agenda</a>
+            <a href="/INCIDENCIAS/index.html"><i class="fa-solid fa-triangle-exclamation"></i> Dashboard Incidencias</a>
+            <a href="/COMPROMISO/index.html"><i class="fa-solid fa-file-signature"></i> Dashboard Carta de
+                Compromiso</a>
+        </nav>
+    </div>
+
+    <div class="main-content" id="mainContent">
+
+        <header class="main-header">
+            <div class="header-left">
+                <button id="btn-toggle-sidebar" class="btn-toggle"><i class="fa-solid fa-bars"></i></button>
+                <div class="brand">
+                    <h1>DETALLE DE INGRESOS RECEPCIÓN</h1>
+                    <p>CEDIS | Control de Operaciones en Tiempo Real</p>
+                </div>
+            </div>
+
+            <div class="filter-bar">
+                <div class="dropdown-container">
+                    <button class="dropdown-btn" onclick="toggleDropdownMenu('drop-ano')">Año <i
+                            class="fa-solid fa-chevron-down"></i></button>
+                    <div id="drop-ano" class="dropdown-content-list"></div>
+                </div>
+
+                <div class="dropdown-container">
+                    <button class="dropdown-btn" onclick="toggleDropdownMenu('drop-mes')">Mes <i
+                            class="fa-solid fa-chevron-down"></i></button>
+                    <div id="drop-mes" class="dropdown-content-list">
+                        <button class="btn-toggle-all" id="btn-toggle-mes"
+                            onclick="alternarSeleccionRapida('chk-mes', 'btn-toggle-mes')">Desmarcar todo</button>
+                    </div>
+                </div>
+
+                <div class="dropdown-container">
+                    <button class="dropdown-btn" onclick="toggleDropdownMenu('drop-semana')">Semana <i
+                            class="fa-solid fa-chevron-down"></i></button>
+                    <div id="drop-semana" class="dropdown-content-list"></div>
+                </div>
+            </div>
+        </header>
+
+        <section class="kpi-row">
+            <div class="card-kpi">
+                <div class="kpi-val" id="val-prov-total">0</div>
+                <div class="kpi-label"><i class="fa-solid fa-truck"></i> Proveedores</div>
+            </div>
+            <div class="card-kpi">
+                <div class="kpi-val" id="val-horas-plan">0.0h</div>
+                <div class="kpi-label"><i class="fa-solid fa-clock"></i> Horas Planificadas</div>
+            </div>
+            <div class="card-kpi">
+                <div class="kpi-val" id="val-horas-ejec">0.0h</div>
+                <div class="kpi-label"><i class="fa-solid fa-circle-check"></i> Horas Ejecutadas</div>
+            </div>
+            <div class="card-kpi">
+                <div class="kpi-val" id="val-cumplimiento">0%</div>
+                <div class="kpi-label"><i class="fa-solid fa-percent"></i> Cumplimiento</div>
+            </div>
+            <div class="card-kpi">
+                <div class="kpi-val" id="val-ocupacion">0%</div>
+                <div class="kpi-label"><i class="fa-solid fa-warehouse"></i> Ocupación Agenda</div>
+            </div>
+        </section>
+
+        <section class="charts-row" id="chartsRow">
+            <div class="chart-box main-chart" id="mainChartBox">
+                <div class="chart-header">
+                    <h3>Tendencia Diaria (Capacidad vs Planificado vs Ejecutado)</h3>
+                    <button class="btn-expand" id="btnExpandChart" onclick="toggleExpansionGrafico()">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
+                </div>
+                <div class="canvas-holder">
+                    <canvas id="chart-linea-historico"></canvas>
+                </div>
+            </div>
+            <div class="chart-box side-chart" id="sideChartGauge">
+                <h3>Porcentaje Almacén</h3>
+                <div class="canvas-holder gauge-container">
+                    <canvas id="chart-medidor-almacen"></canvas>
+                </div>
+            </div>
+            <div class="chart-box side-chart" id="sideChartProvider">
+                <h3>Total de Horas por Proveedor</h3>
+                <div class="canvas-holder">
+                    <canvas id="chart-barras-proveedor"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="table-section">
+            <div class="table-title">
+                <div class="title-left">
+                    <h3>Registros Históricos de la Base de Datos</h3>
+                    <button id="btn-clear-filters" class="btn-clear"><i class="fa-solid fa-filter-circle-xmark"></i>
+                        Limpiar Filtros</button>
+                    <span id="active-graph-filters"
+                        style="font-size: 11px; color: #00A3E0; font-weight: bold; display: none;"><i
+                            class="fa-solid fa-circle-info"></i> Filtro gráfico activo</span>
+                </div>
+                <span class="counter-badge" id="table-counter">0 / 0 Registros</span>
+            </div>
+
+            <div class="table-overflow">
+                <table id="data-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="header-cell">
+                                    <span>Fecha</span>
+                                    <i class="fa-solid fa-filter filter-icon" data-popover="popover-mes-tabla"></i>
+                                    <div id="popover-mes-tabla" class="popover-content">
+                                        <button class="btn-toggle-all" id="btn-toggle-mes-tbl"
+                                            onclick="alternarSeleccionRapida('chk-tbl-mes', 'btn-toggle-mes-tbl')">Desmarcar
+                                            todo</button>
+                                        <div class="checkbox-list" id="popover-mes-tabla-content"></div>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="header-cell">
+                                    <span>Proveedor</span>
+                                    <i class="fa-solid fa-magnifying-glass filter-icon" data-popover="popover-prov"></i>
+                                    <div id="popover-prov" class="popover-content">
+                                        <input type="text" id="input-search-prov" placeholder="Escribe proveedor..."
+                                            oninput="ejecutarFiltrosInternos()">
+                                    </div>
+                                </div>
+                            </th>
+                            <th>Hr Inicio</th>
+                            <th>Hr Fin</th>
+                            <th>
+                                <div class="header-cell">
+                                    <span>SKUs</span>
+                                    <i class="fa-solid fa-sort" onclick="alternarOrdenSku()"
+                                        style="cursor:pointer; color:#94A3B8;"></i>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="header-cell">
+                                    <span>LPNs</span>
+                                    <i class="fa-solid fa-sort" onclick="alternarOrdenLpn()"
+                                        style="cursor:pointer; color:#94A3B8;"></i>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="header-cell">
+                                    <span>Origen</span>
+                                    <i class="fa-solid fa-filter filter-icon" data-popover="popover-origen"></i>
+                                    <div id="popover-origen" class="popover-content checkbox-list">
+                                        <button class="btn-toggle-all" id="btn-toggle-origen"
+                                            onclick="alternarSeleccionRapida('chk-origen', 'btn-toggle-origen')">Desmarcar
+                                            todo</button>
+                                        <label><input type="checkbox" value="CDS" class="chk-origen" checked
+                                                onchange="ejecutarFiltrosInternos()"> CDS</label>
+                                        <label><input type="checkbox" value="DP" class="chk-origen" checked
+                                                onchange="ejecutarFiltrosInternos()"> DP</label>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="header-cell">
+                                    <span>Estado</span>
+                                    <i class="fa-solid fa-filter filter-icon" data-popover="popover-estado"></i>
+                                    <div id="popover-estado" class="popover-content checkbox-list">
+                                        <button class="btn-toggle-all" id="btn-toggle-estado"
+                                            onclick="alternarSeleccionRapida('chk-estado', 'btn-toggle-estado')">Desmarcar
+                                            todo</button>
+                                        <label><input type="checkbox" value="Agendado" class="chk-estado" checked
+                                                onchange="ejecutarFiltrosInternos()"> Agendado</label>
+                                        <label><input type="checkbox" value="Recepcionado" class="chk-estado" checked
+                                                onchange="ejecutarFiltrosInternos()"> Recepcionado</label>
+                                        <label><input type="checkbox" value="Finalizado" class="chk-estado" checked
+                                                onchange="ejecutarFiltrosInternos()"> Finalizado</label>
+                                        <label><input type="checkbox" value="Cancelado" class="chk-estado" checked
+                                                onchange="ejecutarFiltrosInternos()"> Cancelado</label>
+                                    </div>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="8" class="loading-td" id="status-message">Iniciando enlace con base de datos de
+                                Supabase...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script src="/AGENDA/app.js"></script>
+</body>
+
+</html>
