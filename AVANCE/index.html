@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Ingresos | Farmacorp</title>
+    <link rel="stylesheet" href="/AVANCE/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <div class="sidebar" id="sidebarMenu">
+        <div class="sidebar-brand">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Módulos</span>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="../index.html"><i class="fa-solid fa-home"></i> Centro de Control</a>
+            <hr style="border: 0.5px solid #2a3b5c; margin: 10px 0;">
+            <a href="#" class="active"><i class="fa-solid fa-chart-line"></i> Dashboard Recepción</a>
+            <a href="../PRODUCTIVIDAD/index.html"><i class="fa-solid fa-boxes-packing"></i> Dashboard Productividad</a>
+            <a href="../AGENDA/index.html"><i class="fa-solid fa-calendar-days"></i> Dashboard Agenda</a>
+            <a href="../INCIDENCIAS/index.html"><i class="fa-solid fa-triangle-exclamation"></i> Dashboard
+                Incidencias</a>
+            <a href="../COMPROMISO/index.html"><i class="fa-solid fa-file-signature"></i> Dashboard Carta de
+                Compromiso</a>
+        </nav>
+    </div>
+
+    <div class="main-content" id="mainContent">
+
+        <header class="main-header">
+            <div class="header-left">
+                <button id="btn-toggle-sidebar" class="btn-toggle"><i class="fa-solid fa-bars"></i></button>
+                <div class="brand">
+                    <h1>DETALLE DE INGRESOS RECEPCIÓN</h1>
+                    <p>CEDIS | Control de Operaciones en Tiempo Real</p>
+                </div>
+            </div>
+
+            <div class="filter-bar">
+                <div class="dropdown-container">
+                    <button class="dropdown-btn" onclick="toggleDropdownMenu('drop-ano')">Año <i
+                            class="fa-solid fa-chevron-down"></i></button>
+                    <div id="drop-ano" class="dropdown-content-list">
+                        <label><input type="checkbox" value="2026" class="chk-header-ano" checked
+                                onchange="manejarCambioFechaSuperior()"> 2026</label>
+                        <label><input type="checkbox" value="2025" class="chk-header-ano"
+                                onchange="manejarCambioFechaSuperior()"> 2025</label>
+                    </div>
+                </div>
+
+                <div class="dropdown-container">
+                    <button class="dropdown-btn" onclick="toggleDropdownMenu('drop-mes')">Mes <i
+                            class="fa-solid fa-chevron-down"></i></button>
+                    <div id="drop-mes" class="dropdown-content-list">
+                        <button class="btn-toggle-all"
+                            onclick="alternarSeleccionGrupo('chk-header-mes', this)">Desmarcar todo</button>
+                        <label><input type="checkbox" value="01" class="chk-header-mes" checked
+                                onchange="manejarCambioFechaSuperior()"> Enero</label>
+                        <label><input type="checkbox" value="02" class="chk-header-mes" checked
+                                onchange="manejarCambioFechaSuperior()"> Febrero</label>
+                        <label><input type="checkbox" value="03" class="chk-header-mes" checked
+                                onchange="manejarCambioFechaSuperior()"> Marzo</label>
+                        <label><input type="checkbox" value="04" class="chk-header-mes" checked
+                                onchange="manejarCambioFechaSuperior()"> Abril</label>
+                        <label><input type="checkbox" value="05" class="chk-header-mes" checked
+                                onchange="manejarCambioFechaSuperior()"> Mayo</label>
+                        <label><input type="checkbox" value="06" class="chk-header-mes" checked
+                                onchange="manejarCambioFechaSuperior()"> Junio</label>
+                        <label><input type="checkbox" value="07" class="chk-header-mes" checked
+                                onchange="manejarCambioFechaSuperior()"> Julio</label>
+                        <label><input type="checkbox" value="08" class="chk-header-mes"
+                                onchange="manejarCambioFechaSuperior()"> Agosto</label>
+                        <label><input type="checkbox" value="09" class="chk-header-mes"
+                                onchange="manejarCambioFechaSuperior()"> Septiembre</label>
+                        <label><input type="checkbox" value="10" class="chk-header-mes"
+                                onchange="manejarCambioFechaSuperior()"> Octubre</label>
+                        <label><input type="checkbox" value="11" class="chk-header-mes"
+                                onchange="manejarCambioFechaSuperior()"> Noviembre</label>
+                        <label><input type="checkbox" value="12" class="chk-header-mes"
+                                onchange="manejarCambioFechaSuperior()"> Diciembre</label>
+                    </div>
+                </div>
+
+                <div class="dropdown-container">
+                    <button class="dropdown-btn" onclick="toggleDropdownMenu('drop-semana')">Semana <i
+                            class="fa-solid fa-chevron-down"></i></button>
+                    <div id="drop-semana" class="dropdown-content-list">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="kpi-row">
+            <div class="card-kpi">
+                <div class="kpi-val" id="val-total-asn">0</div>
+                <div class="kpi-label"><i class="fa-solid fa-file-lines"></i> Total ASN</div>
+            </div>
+            <div class="card-kpi">
+                <div class="kpi-val" id="val-lpn-plan">0</div>
+                <div class="kpi-label"><i class="fa-solid fa-boxes-stacked"></i> Total LPN</div>
+            </div>
+            <div class="card-kpi">
+                <div class="kpi-val" id="val-sku-total">0</div>
+                <div class="kpi-label"><i class="fa-solid fa-tags"></i> Total SKU</div>
+            </div>
+            <div class="card-kpi">
+                <div class="kpi-val" id="val-prov-total">0</div>
+                <div class="kpi-label"><i class="fa-solid fa-truck"></i> Proveedores</div>
+            </div>
+        </section>
+
+        <section class="charts-row" id="chartsRow">
+            <div class="chart-box main-chart" id="box-tendencia">
+                <div class="chart-header-expand">
+                    <h3>Tendencia Diaria</h3>
+                    <button id="btn-expand-tendencia" class="btn-expand" title="Expandir/Contraer">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
+                </div>
+                <div class="canvas-holder">
+                    <canvas id="chart-linea-historico"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-box side-chart" id="box-tipo-asn">
+                <h3>Tipo ASN</h3>
+                <div class="canvas-holder doughnut-container">
+                    <div id="doughnut-center-text" class="doughnut-center-text">0</div>
+                    <canvas id="chart-dona-tipo"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-box side-chart" id="box-volumen-origen">
+                <h3>Volumen por Almacén (CDS vs DP)</h3>
+                <div class="canvas-holder">
+                    <canvas id="chart-barras-origen"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="table-section">
+            <div class="table-title">
+                <div class="title-left">
+                    <h3>Registros Historicos</h3>
+                    <button id="btn-clear-filters" class="btn-clear"><i class="fa-solid fa-filter-circle-xmark"></i>
+                        Limpiar Filtros</button>
+                </div>
+                <span class="counter-badge" id="table-counter">0 / 0 Registros</span>
+            </div>
+
+            <div class="table-overflow">
+                <table id="data-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="header-cell">
+                                    <span>Nro ASN</span>
+                                    <div class="search-popover-container">
+                                        <i class="fa-solid fa-magnifying-glass filter-icon"
+                                            data-popover="popover-asn"></i>
+                                        <div id="popover-asn" class="popover-content">
+                                            <input type="text" id="input-search-asn" placeholder="Buscar ASN..."
+                                                oninput="ejecutarFiltrosInternos()">
+                                        </div>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="header-cell">
+                                    <span>Nombre de Proveedor</span>
+                                    <div class="search-popover-container">
+                                        <i class="fa-solid fa-magnifying-glass filter-icon"
+                                            data-popover="popover-prov"></i>
+                                        <div id="popover-prov" class="popover-content">
+                                            <input type="text" id="input-search-prov" placeholder="Buscar proveedor..."
+                                                oninput="ejecutarFiltrosInternos()">
+                                        </div>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="header-cell">
+                                    <span>Números de OC</span>
+                                    <div class="search-popover-container">
+                                        <i class="fa-solid fa-magnifying-glass filter-icon"
+                                            data-popover="popover-oc"></i>
+                                        <div id="popover-oc" class="popover-content">
+                                            <input type="text" id="input-search-oc" placeholder="Buscar OC..."
+                                                oninput="ejecutarFiltrosInternos()">
+                                        </div>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="cursor-pointer" onclick="alternarOrdenNumero('Número de artículos')">
+                                <div class="header-cell">
+                                    <span>Artículos (SKU)</span>
+                                    <i class="fa-solid fa-sort sort-icon" id="sort-sku"></i>
+                                </div>
+                            </th>
+                            <th class="cursor-pointer" onclick="alternarOrdenNumero('Nro LPN')">
+                                <div class="header-cell">
+                                    <span>Nro LPN</span>
+                                    <i class="fa-solid fa-sort sort-icon" id="sort-lpn"></i>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="header-cell">
+                                    <span>Tipo ASN</span>
+                                    <div class="search-popover-container">
+                                        <i class="fa-solid fa-filter filter-icon" data-popover="popover-tipo"></i>
+                                        <div id="popover-tipo" class="popover-content checkbox-list">
+                                            <label><input type="checkbox" value="EC" class="chk-tipo" checked
+                                                    onchange="ejecutarFiltrosInternos()"> EC</label>
+                                            <label><input type="checkbox" value="ET" class="chk-tipo" checked
+                                                    onchange="ejecutarFiltrosInternos()"> ET</label>
+                                            <label><input type="checkbox" value="RF" class="chk-tipo" checked
+                                                    onchange="ejecutarFiltrosInternos()"> RF</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="header-cell">
+                                    <span>Fecha de Agenda</span>
+                                    <div class="search-popover-container">
+                                        <i class="fa-solid fa-filter filter-icon" data-popover="popover-fecha"></i>
+                                        <div id="popover-fecha" class="popover-content checkbox-list">
+                                        </div>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="header-cell">
+                                    <span>Origen</span>
+                                    <div class="search-popover-container">
+                                        <i class="fa-solid fa-filter filter-icon" data-popover="popover-origen"></i>
+                                        <div id="popover-origen" class="popover-content checkbox-list">
+                                            <label><input type="checkbox" value="CDS" class="chk-origen" checked
+                                                    onchange="ejecutarFiltrosInternos()"> CDS</label>
+                                            <label><input type="checkbox" value="DP" class="chk-origen" checked
+                                                    onchange="ejecutarFiltrosInternos()"> DP</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="8" class="loading-td">Cargando base de datos...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script src="/AVANCE/app.js"></script>
+</body>
+
+</html>
