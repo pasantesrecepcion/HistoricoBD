@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Productividad | Antigravity WMS</title>
+    <link rel="stylesheet" href="/PRODUCTIVIDAD/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Plugin para renderizar los números dentro de los gráficos de Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+</head>
+
+<body>
+
+    <!-- MENÚ LATERAL -->
+    <div class="sidebar" id="sidebarMenu">
+        <div class="sidebar-brand">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Módulos</span>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="/index.html"><i class="fa-solid fa-home"></i> Centro de Control</a>
+            <hr style="border: 0.5px solid #2a3b5c; margin: 10px 0;">
+            <a href="/AVANCE/index.html"><i class="fa-solid fa-chart-line"></i> Dashboard Recepción</a>
+            <a href="/PRODUCTIVIDAD/index.html" class="active"><i class="fa-solid fa-boxes-packing"></i> Dashboard
+                Productividad</a>
+            <a href="/AGENDA/index.html"><i class="fa-solid fa-calendar-days"></i> Dashboard Agenda</a>
+            <a href="/INCIDENCIAS/index.html"><i class="fa-solid fa-triangle-exclamation"></i> Dashboard Incidencias</a>
+            <a href="/COMPROMISO/index.html"><i class="fa-solid fa-file-signature"></i> Dashboard Carta de
+                Compromiso</a>
+        </nav>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="main-content" id="mainContent">
+
+        <!-- CABECERA CELESTE CON FILTROS SUPERIORES -->
+        <header class="main-header">
+            <div class="header-left">
+                <button id="btn-toggle-sidebar" class="btn-toggle"><i class="fa-solid fa-bars"></i></button>
+                <div class="brand">
+                    <h1>PRODUCTIVIDAD DE RECEPCIÓN</h1>
+                    <p>CEDIS | Control de Operadores en Tiempo Real</p>
+                </div>
+            </div>
+
+            <!-- FILTROS SUPERIORES COMPACTOS -->
+            <div class="header-filters">
+                <!-- Dropdown Operadores Multi-selección con Casilleros -->
+                <div class="dropdown-filter" id="dropdown-usuario-container">
+                    <button class="btn-dropdown" onclick="toggleDropdown('drop-operadores')">
+                        <i class="fa-solid fa-user-gear"></i> Operadores <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="dropdown-content" id="drop-operadores">
+                        <div class="dropdown-actions">
+                            <button onclick="toggleSelectAll('operadores', this)">Desmarcar Todo</button>
+                        </div>
+                        <div class="options-container" id="options-operadores"></div>
+                    </div>
+                </div>
+
+                <!-- Dropdown Año -->
+                <div class="dropdown-filter" id="dropdown-anio-container">
+                    <button class="btn-dropdown" onclick="toggleDropdown('drop-anio')">
+                        <i class="fa-solid fa-calendar"></i> Año <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="dropdown-content" id="drop-anio">
+                        <div class="dropdown-actions">
+                            <button onclick="toggleSelectAll('anio', this)">Desmarcar Todo</button>
+                        </div>
+                        <div class="options-container" id="options-anio"></div>
+                    </div>
+                </div>
+
+                <!-- Dropdown Mes -->
+                <div class="dropdown-filter" id="dropdown-mes-container">
+                    <button class="btn-dropdown" onclick="toggleDropdown('drop-mes')">
+                        <i class="fa-solid fa-calendar-days"></i> Mes <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="dropdown-content" id="drop-mes">
+                        <div class="dropdown-actions">
+                            <button onclick="toggleSelectAll('mes', this)">Desmarcar Todo</button>
+                        </div>
+                        <div class="options-container" id="options-mes"></div>
+                    </div>
+                </div>
+
+                <!-- Dropdown Semana -->
+                <div class="dropdown-filter" id="dropdown-semana-container">
+                    <button class="btn-dropdown" onclick="toggleDropdown('drop-semana')">
+                        <i class="fa-solid fa-calendar-week"></i> Semana <i class="fa-solid fa-chevron-down arrow"></i>
+                    </button>
+                    <div class="dropdown-content" id="drop-semana">
+                        <div class="dropdown-actions">
+                            <button onclick="toggleSelectAll('semana', this)">Desmarcar Todo</button>
+                        </div>
+                        <div class="options-container" id="options-semana"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- TARJETAS KPIs RECONSTRUIDAS -->
+        <section class="kpi-row">
+            <div class="card-kpi">
+                <div class="kpi-val" id="val-total-usuarios">0</div>
+                <div class="kpi-label"><i class="fa-solid fa-users"></i> Operadores Activos</div>
+            </div>
+            <div class="card-kpi">
+                <div class="kpi-val" id="val-total-sku">0</div>
+                <div class="kpi-label"><i class="fa-solid fa-boxes-stacked"></i> Total SKU</div>
+            </div>
+            <div class="card-kpi">
+                <div class="kpi-val" id="val-total-lpn">0</div>
+                <div class="kpi-label"><i class="fa-solid fa-box"></i> Total LPN</div>
+            </div>
+            <div class="card-kpi">
+                <div class="kpi-val" id="val-total-asn">0</div>
+                <div class="kpi-label"><i class="fa-solid fa-file-invoice"></i> Total ASN</div>
+            </div>
+            <div class="card-kpi">
+                <div class="kpi-val" id="val-total-proveedores">0</div>
+                <div class="kpi-label"><i class="fa-solid fa-truck-ramp-box"></i> Proveedores</div>
+            </div>
+            <div class="card-kpi card-kpi-highlight">
+                <div class="kpi-val" id="val-rendimiento-total">0.00%</div>
+                <div class="kpi-label"><i class="fa-solid fa-bolt-lightning"></i> Rendimiento Total</div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE GRÁFICOS CON EXPANSIONES -->
+        <section class="charts-section-layout">
+            <div class="charts-top-split" id="topSplitLayout">
+                <!-- Gráfico 1: LPN x HORA -->
+                <div class="chart-main-box" id="box-lpn-hora">
+                    <div class="chart-box-header">
+                        <h3><i class="fa-solid fa-clock"></i> LPN X HORA</h3>
+                        <button class="btn-expand-action" onclick="toggleExpandirHorizontal('box-lpn-hora')">
+                            <i class="fa-solid fa-arrows-left-right"></i>
+                        </button>
+                    </div>
+                    <div class="chart-scroll-viewport-x">
+                        <div class="chart-canvas-inner-container" id="wrapper-lpn-hora"
+                            style="height: 290px; min-width: 100%;">
+                            <canvas id="chartLpnHora"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico 2: Origen Porcentual (Donut) -->
+                <div class="chart-donut-box" id="box-origen-origen">
+                    <div class="chart-box-header">
+                        <h3><i class="fa-solid fa-pie-chart"></i> ORIGEN (CDS vs DP)</h3>
+                    </div>
+                    <div style="height: 290px; position: relative;">
+                        <canvas id="chartOrigen"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico 3: Productividad por Operador -->
+            <div class="chart-full-box" id="box-productividad-op">
+                <div class="chart-box-header">
+                    <h3><i class="fa-solid fa-chart-bar"></i> PRODUCTIVIDAD POR OPERADOR (LPN vs SKU)</h3>
+                    <div class="chart-header-controls">
+                        <select id="select-orden-grafico" class="select-sort-style"
+                            onchange="ejecutarFiltrosInternos()">
+                            <option value="sku">Ordenar por SKU (Mayor a Menor) ⬇</option>
+                            <option value="lpn">Ordenar por LPN (Mayor a Menor) ⬇</option>
+                        </select>
+                        <button class="btn-expand-action" onclick="toggleExpandirVertical('box-productividad-op')">
+                            <i class="fa-solid fa-arrows-up-down"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-scroll-viewport-y" id="scroll-y-productividad">
+                    <div class="chart-canvas-inner-container" id="wrapper-productividad-op"
+                        style="height: 340px; width: 100%;">
+                        <canvas id="chartLpnSkuHorizontal"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- REGISTRO DE RENDIMIENTO CONSOLIDADO -->
+        <section class="table-section">
+            <div class="table-title">
+                <div class="title-left">
+                    <h3><i class="fa-solid fa-list-check"></i> Registro de Rendimiento Consolidado</h3>
+                    <button id="btn-clear-filters" class="btn-clear">
+                        <i class="fa-solid fa-filter-circle-xmark"></i> Limpiar Filtros
+                    </button>
+                </div>
+                <span class="counter-badge" id="table-counter">0 / 0 Registros</span>
+            </div>
+
+            <div class="table-overflow">
+                <table id="data-table">
+                    <thead>
+                        <tr>
+                            <th>OPERADOR</th>
+                            <th style="cursor: pointer;" onclick="alternarOrden('total_sku')">SKU <i
+                                    class="fa-solid fa-sort"></i></th>
+                            <th style="cursor: pointer;" onclick="alternarOrden('total_lpn')">LPN <i
+                                    class="fa-solid fa-sort"></i></th>
+                            <th style="cursor: pointer;" onclick="alternarOrden('recibidos_cds')">CANTIDAD RECIBIDA CDS
+                                <i class="fa-solid fa-sort"></i>
+                            </th>
+                            <th style="cursor: pointer;" onclick="alternarOrden('recibidos_dp')">CANTIDAD RECIBIDA DP <i
+                                    class="fa-solid fa-sort"></i></th>
+                            <th>RENDIMIENTO PROMEDIO COMBINADO</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr>
+                            <td colspan="6" class="loading-td">
+                                <i class="fa-solid fa-circle-notch fa-spin"></i> Estableciendo canal de datos y leyendo
+                                registros...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="/PRODUCTIVIDAD/app.js"></script>
+</body>
+
+</html>
