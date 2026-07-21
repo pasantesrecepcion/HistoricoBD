@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pronóstico Recepción | Antigravity WMS</title>
+    <link rel="stylesheet" href="/PRONOSTICO/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+</head>
+
+<body>
+
+    <!-- BARRA LATERAL -->
+    <div class="sidebar" id="sidebarMenu">
+        <div class="sidebar-brand">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Antigravity WMS</span>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="../index.html"><i class="fa-solid fa-home"></i> Centro de Control</a>
+            <hr style="border: 0.5px solid #2a3b5c; margin: 10px 0;">
+
+            <!-- Dashboard Recepción -->
+            <div class="menu-item-group open">
+                <a href="javascript:void(0);" class="has-submenu" onclick="evtToggleSubmenu(event)">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard Recepción <i
+                        class="fa-solid fa-chevron-down arrow-sub"></i>
+                </a>
+                <div class="submenu">
+                    <a href="../AVANCE/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i> Avance
+                        Recepción</a>
+                    <a href="/PRONOSTICO/index.html" class="active"><i class="fa-solid fa-circle-dot"
+                            style="font-size: 8px;"></i> Pronóstico Recepción</a>
+                </div>
+            </div>
+
+            <!-- Dashboard Productividad -->
+            <div class="menu-item-group">
+                <a href="javascript:void(0);" class="has-submenu" onclick="evtToggleSubmenu(event)">
+                    <i class="fa-solid fa-boxes-packing"></i> Dashboard Productividad <i
+                        class="fa-solid fa-chevron-down arrow-sub"></i>
+                </a>
+                <div class="submenu">
+                    <a href="../PRODUCTIVIDAD/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Avance Operarios Individual</a>
+                    <a href="../CARTONIZACION/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Avance Cartonización</a>
+                    <a href="../GRUPALPROD/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Avance Operarios Grupal</a>
+                </div>
+            </div>
+
+            <a href="../AGENDA/index.html"><i class="fa-solid fa-calendar-days"></i> Dashboard Agenda</a>
+            <a href="../INCIDENCIAS/index.html"><i class="fa-solid fa-triangle-exclamation"></i> Dashboard
+                Incidencias</a>
+            <a href="../COMPROMISO/index.html"><i class="fa-solid fa-file-signature"></i> Dashboard Carta de
+                Compromiso</a>
+            <a href="../RESUMEN/index.html"><i class="fa-solid fa-clipboard-list"></i> Resumen Recepción</a>
+        </nav>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="main-content" id="mainContent">
+
+        <header class="main-header">
+            <div class="header-left">
+                <button id="btn-toggle-sidebar" class="btn-toggle"><i class="fa-solid fa-bars"></i></button>
+                <div class="brand">
+                    <h1>PRONÓSTICO DE RECEPCIÓN</h1>
+                    <p>CEDIS | Proyección y Programación de Ingresos Futuros</p>
+                </div>
+            </div>
+
+            <!-- FILTRO DE FECHAS EN HORIZONTAL -->
+            <div class="header-date-filter">
+                <span class="date-filter-label">FECHA:</span>
+                <div id="date-buttons-container" class="date-buttons-wrapper">
+                    <!-- JS inyectará aquí los botones uno al lado del otro -->
+                </div>
+            </div>
+        </header>
+
+        <!-- KPI ROW (6 CARDS) -->
+        <section class="kpi-row">
+            <div class="card-kpi card-kpi-highlight">
+                <div class="kpi-val" id="val-prov-total">0</div>
+                <div class="kpi-label"><i class="fa-solid fa-truck"></i> PROVEEDORES AGENDADOS</div>
+                <div class="kpi-sub" id="val-horas-plan">0.0h requeridas</div>
+            </div>
+
+            <div class="card-kpi card-kpi-highlight">
+                <div class="kpi-val kpi-val-xl" id="val-horas-ocupadas">0.0h</div>
+                <div class="kpi-label"><i class="fa-solid fa-clock"></i> HORAS OCUPADAS</div>
+                <div class="kpi-sub" id="sub-capacidad-total">de 77.0h cap. total</div>
+            </div>
+
+            <div class="card-kpi card-kpi-highlight">
+                <div class="kpi-val kpi-val-xl" id="val-horas-disponibles">0.0h</div>
+                <div class="kpi-label"><i class="fa-solid fa-hourglass-half"></i> HORAS DISPONIBLES</div>
+                <div class="kpi-sub" id="sub-estado-disp">Tiempo vacante</div>
+            </div>
+
+            <div class="card-kpi card-kpi-highlight">
+                <div class="kpi-val" id="val-lpns-totales">0</div>
+                <div class="kpi-label"><i class="fa-solid fa-pallet"></i> LPN'S PRONOSTICADOS</div>
+                <div class="kpi-sub">Volumen Total</div>
+            </div>
+
+            <div class="card-kpi card-kpi-highlight">
+                <div class="kpi-val" id="val-skus-totales">0</div>
+                <div class="kpi-label"><i class="fa-solid fa-boxes-stacked"></i> SKU'S PRONOSTICADOS</div>
+                <div class="kpi-sub">Variedad de Items</div>
+            </div>
+
+            <div class="card-kpi card-kpi-gauge card-kpi-highlight">
+                <div class="kpi-gauge-info">
+                    <div class="kpi-val" id="val-ocupacion">0%</div>
+                    <div class="kpi-label"><i class="fa-solid fa-gauge-high"></i> OCUPACIÓN</div>
+                </div>
+                <div class="mini-gauge-container">
+                    <canvas id="mini-gauge-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHARTS ROW -->
+        <section class="charts-row" id="chartsRow">
+            <div class="chart-box main-chart chart-box-highlight" id="mainChartBox">
+                <div class="chart-header">
+                    <h3>PRONÓSTICO DE CARGA HORARIA (PRÓXIMOS DÍAS)</h3>
+                    <button class="btn-expand" id="btnExpandChart" onclick="toggleExpansionGrafico()">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
+                </div>
+                <div class="canvas-holder canvas-holder-stacked-area">
+                    <canvas id="chart-linea-historico"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-box side-chart chart-box-highlight" id="sideChartGauge">
+                <h3>Saturación por Destino (FARMACIA vs SALA %)</h3>
+                <div class="canvas-holder gauge-container canvas-holder-doughnut">
+                    <canvas id="chart-medidor-almacen"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-box side-chart chart-box-highlight" id="sideChartProvider">
+                <h3>ALERTA DE SOBRECAPACIDAD HORARIA POR AREA</h3>
+                <div class="canvas-holder canvas-holder-sobrecapacidad">
+                    <canvas id="chart-barras-sobrecapacidad"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- TABLE SECTION -->
+        <section class="table-section">
+            <div class="table-title">
+                <div class="title-left">
+                    <h3>Agenda de Pronóstico de Ingresos</h3>
+                    <button id="btn-clear-filters" class="btn-clear" onclick="limpiarFiltros()"><i
+                            class="fa-solid fa-filter-circle-xmark"></i> Limpiar Filtros</button>
+                </div>
+                <span class="counter-badge" id="table-counter">0 / 0 Registros</span>
+            </div>
+
+            <div class="table-overflow">
+                <table id="data-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>
+                                <div class="header-cell">
+                                    <span>Proveedor</span>
+                                    <i class="fa-solid fa-magnifying-glass filter-icon" data-popover="popover-prov"></i>
+                                    <div id="popover-prov" class="popover-content">
+                                        <input type="text" id="input-search-prov" placeholder="Escribe proveedor..."
+                                            oninput="ejecutarFiltrosInternos()">
+                                    </div>
+                                </div>
+                            </th>
+                            <th>Hr Inicio</th>
+                            <th>Hr Fin</th>
+                            <th>SKUs</th>
+                            <th>LPNs</th>
+                            <th>Origen</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr>
+                            <td colspan="8" class="loading-td" id="status-message">Consultando tabla "agenda_b100" en
+                                Supabase...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script src="/PRONOSTICO/app.js"></script>
+</body>
+
+</html>
