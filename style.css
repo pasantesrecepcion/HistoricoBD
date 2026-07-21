@@ -68,6 +68,54 @@ body {
     color: #FFFFFF;
 }
 
+/* --- NUEVAS CLASES PARA EL SUBMENÚ DESPLEGABLE --- */
+.menu-item-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.sidebar-menu a.has-submenu {
+    justify-content: space-between;
+}
+
+.arrow-sub {
+    font-size: 10px;
+    color: #64748B;
+    transition: transform 0.25s ease;
+}
+
+.submenu {
+    max-height: 0;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    margin-top: 2px;
+    transition: max-height 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Cuando se abre el contenedor padre */
+.menu-item-group.open .submenu {
+    max-height: 150px;
+    /* Suficiente espacio para las opciones */
+}
+
+.menu-item-group.open .arrow-sub {
+    transform: rotate(180deg);
+    color: #00A3E0;
+}
+
+/* Enlaces hijos internos */
+.submenu a {
+    padding: 10px 16px 10px 36px;
+    font-size: 13px;
+    color: #94A3B8;
+}
+
+/* ------------------------------------------------- */
+
 /* MAIN CONTENT */
 .main-content {
     flex: 1;

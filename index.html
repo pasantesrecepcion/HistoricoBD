@@ -19,11 +19,43 @@
         <nav class="sidebar-menu">
             <a href="index.html" class="active"><i class="fa-solid fa-home"></i> Centro de Control</a>
             <hr style="border: 0.5px solid #2a3b5c; margin: 10px 0;">
-            <a href="AVANCE/index.html"><i class="fa-solid fa-chart-line"></i> Dashboard Recepción</a>
-            <a href="PRODUCTIVIDAD/index.html"><i class="fa-solid fa-boxes-packing"></i> Dashboard Productividad</a>
+
+            <!-- Dashboard Recepción con Desplegable -->
+            <div class="menu-item-group">
+                <a href="#" class="has-submenu" onclick="evtToggleSubmenu(event)">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard Recepción <i
+                        class="fa-solid fa-chevron-down arrow-sub"></i>
+                </a>
+                <div class="submenu">
+                    <a href="AVANCE/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i> Avance
+                        Recepción</a>
+                    <a href="PRONOSTICO/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Pronóstico Recepción</a>
+                </div>
+            </div>
+
+            <!-- Dashboard Productividad con Desplegable -->
+            <div class="menu-item-group">
+                <a href="#" class="has-submenu" onclick="evtToggleSubmenu(event)">
+                    <i class="fa-solid fa-boxes-packing"></i> Dashboard Productividad <i
+                        class="fa-solid fa-chevron-down arrow-sub"></i>
+                </a>
+                <div class="submenu">
+                    <a href="PRODUCTIVIDAD/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Avance Operarios Individual</a>
+                    <a href="CARTONIZACION/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Avance Cartonización</a>
+                    <a href="GRUPALPROD/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Avance Operarios Grupal</a>
+                </div>
+            </div>
+
             <a href="AGENDA/index.html"><i class="fa-solid fa-calendar-days"></i> Dashboard Agenda</a>
             <a href="INCIDENCIAS/index.html"><i class="fa-solid fa-triangle-exclamation"></i> Dashboard Incidencias</a>
             <a href="COMPROMISO/index.html"><i class="fa-solid fa-file-signature"></i> Dashboard Carta de Compromiso</a>
+
+            <!-- Último elemento -->
+            <a href="RESUMEN/index.html"><i class="fa-solid fa-clipboard-list"></i> Resumen Recepción</a>
         </nav>
     </div>
 
@@ -42,6 +74,7 @@
             <h2>Seleccione un módulo de trabajo</h2>
             <div class="portal-grid">
 
+                <!-- FILA 1 -->
                 <a href="AVANCE/index.html" class="portal-card">
                     <i class="fa-solid fa-chart-line"></i>
                     <h3>Recepción</h3>
@@ -60,6 +93,7 @@
                     <p>Calendario, planificaciones y citas de carga</p>
                 </a>
 
+                <!-- FILA 2 -->
                 <a href="INCIDENCIAS/index.html" class="portal-card">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     <h3>Incidencias</h3>
@@ -70,6 +104,12 @@
                     <i class="fa-solid fa-file-signature"></i>
                     <h3>Carta de Compromiso</h3>
                     <p>Seguimiento de convenios y acuerdos logísticos</p>
+                </a>
+
+                <a href="RESUMEN/index.html" class="portal-card">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <h3>Resumen Recepción</h3>
+                    <p>Consolidado general e indicadores de cierre</p>
                 </a>
 
             </div>
