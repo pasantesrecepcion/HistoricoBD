@@ -625,3 +625,23 @@ function loadFallbackData() {
     poblarDropdownsDeFiltros(totalRecords_Raw);
     ejecutarFiltrosCombinados();
 }
+// Función idéntica al Centro de Control para desplegar los submenús
+window.evtToggleSubmenu = function (event) {
+    event.preventDefault(); // Evita cualquier comportamiento de navegación
+    event.stopPropagation(); // Evita que el click se propague a otros elementos
+
+    // Conseguimos el contenedor del grupo ('menu-item-group')
+    const currentGroup = event.currentTarget.closest('.menu-item-group');
+
+    // Cierra los otros menús abiertos para que actúe como acordeón (opcional, igual al portal)
+    document.querySelectorAll('.menu-item-group').forEach(group => {
+        if (group !== currentGroup) {
+            group.classList.remove('open');
+        }
+    });
+
+    // Alterna la clase 'open' en el menú al que le hiciste click
+    if (currentGroup) {
+        currentGroup.classList.toggle('open');
+    }
+};
