@@ -12,6 +12,7 @@ body {
     overflow-x: hidden;
 }
 
+/* SIDEBAR INTEGRADO CON SUBMENÚS */
 .sidebar {
     width: 260px;
     background: #0A2540;
@@ -24,7 +25,8 @@ body {
     flex-direction: column;
     gap: 30px;
     z-index: 500;
-    transition: margin-left 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
 }
 
 .sidebar.hidden {
@@ -40,6 +42,12 @@ body {
     color: #00A3E0;
 }
 
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
 .sidebar-menu a {
     display: flex;
     align-items: center;
@@ -50,12 +58,58 @@ body {
     border-radius: 8px;
     font-size: 14px;
     font-weight: 500;
+    transition: 0.3s;
 }
 
 .sidebar-menu a.active,
 .sidebar-menu a:hover {
     background: rgba(255, 255, 255, 0.08);
     color: #FFFFFF;
+}
+
+/* --- CLASES DEL SUBMENÚ DESPLEGABLE --- */
+.menu-item-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.sidebar-menu a.has-submenu {
+    justify-content: space-between;
+}
+
+.arrow-sub {
+    font-size: 10px;
+    color: #64748B;
+    transition: transform 0.25s ease;
+}
+
+.submenu {
+    max-height: 0;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    margin-top: 2px;
+    transition: max-height 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Inyección de JS para apertura fluida */
+.menu-item-group.open .submenu {
+    max-height: 150px;
+}
+
+.menu-item-group.open .arrow-sub {
+    transform: rotate(180deg);
+    color: #00A3E0;
+}
+
+/* Enlaces hijos internos */
+.submenu a {
+    padding: 10px 16px 10px 36px;
+    font-size: 13px;
+    color: #94A3B8;
 }
 
 .main-content {

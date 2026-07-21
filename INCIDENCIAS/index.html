@@ -13,24 +13,56 @@
 
 <body>
 
-    <!-- SIDEBAR DE NAVEGACIÓN -->
+    <!-- BARRA LATERAL CON SUBMENÚS DESPLEGABLES -->
     <div class="sidebar" id="sidebarMenu">
         <div class="sidebar-brand">
             <i class="fa-solid fa-layer-group"></i>
-            <span>Módulos</span>
+            <span>Antigravity WMS</span>
         </div>
         <nav class="sidebar-menu">
-            <a href="/index.html"><i class="fa-solid fa-home"></i> Centro de Control</a>
+            <a href="../index.html"><i class="fa-solid fa-home"></i> Centro de Control</a>
             <hr style="border: 0.5px solid #2a3b5c; margin: 10px 0;">
-            <a href="/AVANCE/index.html"><i class="fa-solid fa-chart-line"></i> Dashboard Recepción</a>
-            <a href="/PRODUCTIVIDAD/index.html"><i class="fa-solid fa-boxes-packing"></i> Dashboard Productividad</a>
-            <a href="/AGENDA/index.html"><i class="fa-solid fa-calendar-days"></i> Dashboard Agenda</a>
-            <a href="#" class="active"><i class="fa-solid fa-triangle-exclamation"></i> Dashboard Incidencias</a>
-            <a href="/COMPROMISO/index.html"><i class="fa-solid fa-file-signature"></i> Dashboard Carta de
+
+            <!-- Dashboard Recepción con Desplegable -->
+            <div class="menu-item-group">
+                <a href="javascript:void(0);" class="has-submenu" onclick="evtToggleSubmenu(event)">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard Recepción
+                    <i class="fa-solid fa-chevron-down arrow-sub"></i>
+                </a>
+                <div class="submenu">
+                    <a href="../AVANCE/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i> Avance
+                        Recepción</a>
+                    <a href="../PRONOSTICO/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Pronóstico Recepción</a>
+                </div>
+            </div>
+
+            <!-- Dashboard Productividad con Desplegable -->
+            <div class="menu-item-group">
+                <a href="javascript:void(0);" class="has-submenu" onclick="evtToggleSubmenu(event)">
+                    <i class="fa-solid fa-boxes-packing"></i> Dashboard Productividad
+                    <i class="fa-solid fa-chevron-down arrow-sub"></i>
+                </a>
+                <div class="submenu">
+                    <a href="../PRODUCTIVIDAD/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Avance Operarios Individual</a>
+                    <a href="../CARTONIZACION/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Avance Cartonización</a>
+                    <a href="../GRUPALPROD/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Avance Operarios Grupal</a>
+                </div>
+            </div>
+
+            <a href="../AGENDA/index.html"><i class="fa-solid fa-calendar-days"></i> Dashboard Agenda</a>
+            <a href="../INCIDENCIAS/index.html"><i class="fa-solid fa-triangle-exclamation"></i> Dashboard
+                Incidencias</a>
+            <a href="../COMPROMISO/index.html"><i class="fa-solid fa-file-signature"></i> Dashboard Carta de
                 Compromiso</a>
+
+            <!-- Último elemento -->
+            <a href="../RESUMEN/index.html"><i class="fa-solid fa-clipboard-list"></i> Resumen Recepción</a>
         </nav>
     </div>
-
     <!-- CONTENIDO PRINCIPAL -->
     <div class="main-content" id="mainContent">
 

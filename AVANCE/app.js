@@ -519,6 +519,13 @@ document.getElementById('btn-expand-tendencia').addEventListener('click', functi
         this.setAttribute('title', 'Expandir');
     }
 
+    function evtToggleSubmenu(event) {
+        event.preventDefault();
+        const group = event.currentTarget.closest('.menu-item-group');
+        if (group) {
+            group.classList.toggle('open');
+        }
+    }
     // Reajustar el tamaño del gráfico interno de Chart.js adaptándose fluidamente
     let pasadas = 0;
     const intervalResize = setInterval(() => {

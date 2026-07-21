@@ -13,24 +13,56 @@
 
 <body>
 
+    <!-- BARRA LATERAL IDÉNTICA AL CENTRO DE CONTROL Y AGENDA -->
     <div class="sidebar" id="sidebarMenu">
         <div class="sidebar-brand">
             <i class="fa-solid fa-layer-group"></i>
-            <span>Módulos</span>
+            <span>Antigravity WMS</span>
         </div>
         <nav class="sidebar-menu">
             <a href="../index.html"><i class="fa-solid fa-home"></i> Centro de Control</a>
             <hr style="border: 0.5px solid #2a3b5c; margin: 10px 0;">
-            <a href="#" class="active"><i class="fa-solid fa-chart-line"></i> Dashboard Recepción</a>
-            <a href="../PRODUCTIVIDAD/index.html"><i class="fa-solid fa-boxes-packing"></i> Dashboard Productividad</a>
+
+            <!-- Dashboard Recepción con Desplegable (Avance está dentro y activo) -->
+            <div class="menu-item-group open">
+                <a href="javascript:void(0);" class="has-submenu" onclick="evtToggleSubmenu(event)">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard Recepción <i
+                        class="fa-solid fa-chevron-down arrow-sub"></i>
+                </a>
+                <div class="submenu">
+                    <a href="../AVANCE/index.html" class="active"><i class="fa-solid fa-circle-dot"
+                            style="font-size: 8px;"></i> Avance Recepción</a>
+                    <a href="../PRONOSTICO/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Pronóstico Recepción</a>
+                </div>
+            </div>
+
+            <!-- Dashboard Productivity con Desplegable -->
+            <div class="menu-item-group">
+                <a href="javascript:void(0);" class="has-submenu" onclick="evtToggleSubmenu(event)">
+                    <i class="fa-solid fa-boxes-packing"></i> Dashboard Productividad <i
+                        class="fa-solid fa-chevron-down arrow-sub"></i>
+                </a>
+                <div class="submenu">
+                    <a href="../PRODUCTIVIDAD/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Avance Operarios Individual</a>
+                    <a href="../CARTONIZACION/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Avance Cartonización</a>
+                    <a href="../GRUPALPROD/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Avance Operarios Grupal</a>
+                </div>
+            </div>
+
             <a href="../AGENDA/index.html"><i class="fa-solid fa-calendar-days"></i> Dashboard Agenda</a>
             <a href="../INCIDENCIAS/index.html"><i class="fa-solid fa-triangle-exclamation"></i> Dashboard
                 Incidencias</a>
             <a href="../COMPROMISO/index.html"><i class="fa-solid fa-file-signature"></i> Dashboard Carta de
                 Compromiso</a>
+
+            <!-- Último elemento -->
+            <a href="../RESUMEN/index.html"><i class="fa-solid fa-clipboard-list"></i> Resumen Recepción</a>
         </nav>
     </div>
-
     <div class="main-content" id="mainContent">
 
         <header class="main-header">
@@ -260,8 +292,30 @@
             </div>
         </section>
     </div>
+    <!-- ... tu código anterior ... -->
 
-    <script src="/AVANCE/app.js"></script>
+    <script>
+        // Forzamos la función directamente en el HTML para evitar bloqueos de app.js
+        function evtToggleSubmenu(event) {
+            // Evitamos que intente navegar hacia el javascript:void(0)
+            if (event) event.preventDefault();
+
+            // Buscamos el contenedor padre del menú
+            const link = event.currentTarget || event.target.closest('.has-submenu');
+            const group = link.closest('.menu-item-group');
+
+            if (group) {
+                group.classList.toggle('open');
+                console.log("Submenú alternado. Estado actual 'open':", group.classList.contains('open'));
+            } else {
+                console.error("No se encontró el contenedor '.menu-item-group'");
+            }
+        }
+    </script>
+</body>
+
+</html>
+<script src="/AVANCE/app.js"></script>
 </body>
 
 </html>

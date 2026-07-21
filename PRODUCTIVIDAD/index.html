@@ -10,27 +10,57 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Plugin para renderizar los números dentro de los gráficos de Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 </head>
 
 <body>
 
-    <!-- MENÚ LATERAL -->
+    <!-- MENÚ LATERAL DESPLEGABLE RECONSTRUIDO -->
     <div class="sidebar" id="sidebarMenu">
         <div class="sidebar-brand">
             <i class="fa-solid fa-layer-group"></i>
-            <span>Módulos</span>
+            <span>Antigravity WMS</span>
         </div>
         <nav class="sidebar-menu">
-            <a href="/index.html"><i class="fa-solid fa-home"></i> Centro de Control</a>
+            <a href="../index.html"><i class="fa-solid fa-home"></i> Centro de Control</a>
             <hr style="border: 0.5px solid #2a3b5c; margin: 10px 0;">
-            <a href="/AVANCE/index.html"><i class="fa-solid fa-chart-line"></i> Dashboard Recepción</a>
-            <a href="/PRODUCTIVIDAD/index.html" class="active"><i class="fa-solid fa-boxes-packing"></i> Dashboard
-                Productividad</a>
-            <a href="/AGENDA/index.html"><i class="fa-solid fa-calendar-days"></i> Dashboard Agenda</a>
-            <a href="/INCIDENCIAS/index.html"><i class="fa-solid fa-triangle-exclamation"></i> Dashboard Incidencias</a>
-            <a href="/COMPROMISO/index.html"><i class="fa-solid fa-file-signature"></i> Dashboard Carta de
+
+            <!-- Dashboard Recepción con Desplegable -->
+            <div class="menu-item-group">
+                <a href="javascript:void(0);" class="has-submenu" onclick="evtToggleSubmenu(event)">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard Recepción <i
+                        class="fa-solid fa-chevron-down arrow-sub"></i>
+                </a>
+                <div class="submenu">
+                    <a href="../AVANCE/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i> Avance
+                        Recepción</a>
+                    <a href="../PRONOSTICO/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Pronóstico Recepción</a>
+                </div>
+            </div>
+
+            <!-- Dashboard Productividad con Desplegable (Activo) -->
+            <div class="menu-item-group open">
+                <a href="javascript:void(0);" class="has-submenu" onclick="evtToggleSubmenu(event)">
+                    <i class="fa-solid fa-boxes-packing"></i> Dashboard Productividad <i
+                        class="fa-solid fa-chevron-down arrow-sub"></i>
+                </a>
+                <div class="submenu">
+                    <a href="../PRODUCTIVIDAD/index.html" class="active"><i class="fa-solid fa-circle-dot"
+                            style="font-size: 8px;"></i> Avance Operarios Individual</a>
+                    <a href="../CARTONIZACION/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Avance Cartonización</a>
+                    <a href="../GRUPALPROD/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Avance Operarios Grupal</a>
+                </div>
+            </div>
+
+            <a href="../AGENDA/index.html"><i class="fa-solid fa-calendar-days"></i> Dashboard Agenda</a>
+            <a href="../INCIDENCIAS/index.html"><i class="fa-solid fa-triangle-exclamation"></i> Dashboard
+                Incidencias</a>
+            <a href="../COMPROMISO/index.html"><i class="fa-solid fa-file-signature"></i> Dashboard Carta de
                 Compromiso</a>
+            <a href="../RESUMEN/index.html"><i class="fa-solid fa-clipboard-list"></i> Resumen Recepción</a>
         </nav>
     </div>
 
@@ -47,7 +77,7 @@
                 </div>
             </div>
 
-            <!-- FILTROS SUPERIORES COMPACTOS -->
+            <!-- FILTROS SUPERIORES COMPACTOS ORIGINALES -->
             <div class="header-filters">
                 <!-- Dropdown Operadores Multi-selección con Casilleros -->
                 <div class="dropdown-filter" id="dropdown-usuario-container">
@@ -103,7 +133,7 @@
             </div>
         </header>
 
-        <!-- TARJETAS KPIs RECONSTRUIDAS -->
+        <!-- TARJETAS KPIs ORIGINALES -->
         <section class="kpi-row">
             <div class="card-kpi">
                 <div class="kpi-val" id="val-total-usuarios">0</div>
@@ -131,7 +161,7 @@
             </div>
         </section>
 
-        <!-- SECCIÓN DE GRÁFICOS CON EXPANSIONES -->
+        <!-- SECCIÓN DE GRÁFICOS ORIGINAL CON EXPANSIONES -->
         <section class="charts-section-layout">
             <div class="charts-top-split" id="topSplitLayout">
                 <!-- Gráfico 1: LPN x HORA -->
@@ -185,7 +215,7 @@
             </div>
         </section>
 
-        <!-- REGISTRO DE RENDIMIENTO CONSOLIDADO -->
+        <!-- REGISTRO DE RENDIMIENTO CONSOLIDADO ORIGINAL -->
         <section class="table-section">
             <div class="table-title">
                 <div class="title-left">
@@ -228,6 +258,17 @@
 
     </div>
 
+    <!-- Script Inline para controlar el Submenú sin interferir con app.js -->
+    <script>
+        function evtToggleSubmenu(event) {
+            if (event) event.preventDefault();
+            const link = event.currentTarget || event.target.closest('.has-submenu');
+            const group = link.closest('.menu-item-group');
+            if (group) {
+                group.classList.toggle('open');
+            }
+        }
+    </script>
     <script src="/PRODUCTIVIDAD/app.js"></script>
 </body>
 

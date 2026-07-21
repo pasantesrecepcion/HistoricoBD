@@ -499,3 +499,11 @@ function resetearFiltros() {
     document.querySelectorAll('.btn-toggle-all').forEach(b => b.textContent = "Desmarcar todo");
     ejecutarFiltrosInternos();
 }
+function evtToggleSubmenu(event) {
+    event.preventDefault();
+    // Busca el contenedor principal .menu-item-group más cercano
+    const group = event.currentTarget.closest('.menu-item-group');
+    if (group) {
+        group.classList.toggle('open');
+    }
+}
