@@ -5,6 +5,9 @@ let supabaseClient = null;
 let totalRecords_Raw = [];
 let records_FilteredByHeader = [];
 
+// Base de datos de Incidencias integrada
+let baseDatosIncidencias = [];
+
 let chartLinea = null;
 let chartMedidor = null;
 let chartHorasProv = null;
@@ -27,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (typeof supabase !== 'undefined') {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             descargarTodosLosDatosSupabase();
+            cargarBaseDatosIncidencias();
         } else {
             loadFallbackData();
         }
@@ -60,6 +64,35 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+// Carga asíncrona de Incidencias desde Supabase
+async function cargarBaseDatosIncidencias() {
+    try {
+        let incidenciasCargadas = [];
+        let desdeI = 0;
+        const limite = 1000;
+        let leyendoIncidencias = true;
+
+        while (leyendoIncidencias) {
+            const { data, error } = await supabaseClient
+                .from('incidencias_proveedores')
+                .select('*')
+                .range(desdeI, desdeI + limite - 1);
+
+            if (error) throw error;
+            if (data && data.length > 0) {
+                incidenciasCargadas = incidenciasCargadas.concat(data);
+                desdeI += limite;
+                if (data.length < limite) leyendoIncidencias = false;
+            } else {
+                leyendoIncidencias = false;
+            }
+        }
+        baseDatosIncidencias = incidenciasCargadas;
+    } catch (err) {
+        console.error("Error al cargar la base de datos de incidencias:", err);
+    }
+}
 
 async function descargarTodosLosDatosSupabase() {
     actualizarMensajeTabla("Estableciendo enlace de alta velocidad con Supabase...");
@@ -233,6 +266,77 @@ function ejecutarFiltrosInternos() {
     renderizarGraficosDinamicamente(recordsFinales);
 }
 
+// LÓGICA DE MOSTRAR EL POPUP FLOTANTE DE "NO VINO" AL DAR CLIC EN LA GRÁFICA
+function mostrarModalNoVino(fechaSeleccionada) {
+    const modal = document.getElementById('modal-incidencias');
+    const container = document.getElementById('modal-cards-container');
+    const modalFecha = document.getElementById('modal-fecha-titulo');
+
+    if (!modal || !container) return;
+
+    modalFecha.innerText = fechaSeleccionada;
+    container.innerHTML = '';
+
+    // Filtrar incidencias de tipo "NO VINO" en la fecha
+    const incidenciasDia = baseDatosIncidencias.filter(i => {
+        const fInc = i.fecha ? i.fecha.split('T')[0] : '';
+        const tipoInc = i.tipo ? i.tipo.trim().toUpperCase() : '';
+        return fInc === fechaSeleccionada && tipoInc === 'NO VINO';
+    });
+
+    if (incidenciasDia.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 20px; color: #64748B;">
+                <i class="fa-solid fa-circle-check" style="font-size: 32px; color: #10B981; margin-bottom: 8px;"></i>
+                <p>No se registraron inasistencias ("NO VINO") para esta fecha.</p>
+            </div>
+        `;
+    } else {
+        incidenciasDia.forEach(inc => {
+            const provNombre = inc.proveedor || "PROVEEDOR NO ESPECIFICADO";
+
+            // Buscar horas de inicio y fin en la agenda
+            const registroAgenda = totalRecords_Raw.find(r => {
+                const fCita = r.fecha ? r.fecha.split('T')[0] : '';
+                const pCita = r.proveedor ? r.proveedor.trim().toUpperCase() : '';
+                return fCita === fechaSeleccionada && pCita === provNombre.trim().toUpperCase();
+            });
+
+            const horaIni = registroAgenda?.hora_inicio ? registroAgenda.hora_inicio.substring(0, 5) : (inc.hora_inicio ? inc.hora_inicio.substring(0, 5) : '--:--');
+            const horaFin = registroAgenda?.hora_fin ? registroAgenda.hora_fin.substring(0, 5) : (inc.hora_fin ? inc.hora_fin.substring(0, 5) : '--:--');
+
+            let horasPerdidas = 0;
+            if (horaIni !== '--:--' && horaFin !== '--:--') {
+                horasPerdidas = (parseTimeToDecimal(horaFin) - parseTimeToDecimal(horaIni)).toFixed(1);
+            } else {
+                horasPerdidas = (inc.horas_perdidas || 0).toFixed(1);
+            }
+
+            const card = document.createElement('div');
+            card.className = 'no-vino-card';
+            card.innerHTML = `
+                <div class="blinking-red-box">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>NO VINO</span>
+                </div>
+                <div class="no-vino-info">
+                    <h4>${provNombre}</h4>
+                    <p><i class="fa-regular fa-clock"></i> Horario Agendado: <strong>${horaIni} - ${horaFin}</strong></p>
+                    <p><i class="fa-solid fa-hourglass-half"></i> Horas Perdidas: <strong style="color: #EF4444;">${horasPerdidas}h</strong></p>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    modal.classList.add('show');
+}
+
+function cerrarModalIncidencias() {
+    const modal = document.getElementById('modal-incidencias');
+    if (modal) modal.classList.remove('show');
+}
+
 function alternarOrdenSku() {
     ordenLpnActual = null;
     ordenSkuActual = (!ordenSkuActual || ordenSkuActual === 'asc') ? 'desc' : 'asc';
@@ -380,7 +484,9 @@ function renderizarGraficosDinamicamente(records) {
                         borderColor: '#00A3E0',
                         backgroundColor: 'rgba(0, 163, 224, 0.05)',
                         tension: 0.25,
-                        fill: true
+                        fill: true,
+                        pointRadius: 5,
+                        pointHoverRadius: 8
                     },
                     {
                         label: 'Horas Ejecutadas',
@@ -388,7 +494,9 @@ function renderizarGraficosDinamicamente(records) {
                         borderColor: '#10B981',
                         backgroundColor: 'rgba(16, 185, 129, 0.05)',
                         tension: 0.25,
-                        fill: true
+                        fill: true,
+                        pointRadius: 5,
+                        pointHoverRadius: 8
                     }
                 ]
             },
@@ -402,6 +510,13 @@ function renderizarGraficosDinamicamente(records) {
                     y: {
                         beginAtZero: true,
                         title: { display: true, text: 'Horas Operacionales' }
+                    }
+                },
+                onClick: (e, activeElements) => {
+                    if (activeElements && activeElements.length > 0) {
+                        const index = activeElements[0].index;
+                        const fechaSeleccionada = diasLabels[index];
+                        mostrarModalNoVino(fechaSeleccionada);
                     }
                 }
             }
@@ -604,10 +719,6 @@ function cerrarTodosLosPopovers() {
     });
 }
 
-function manejarCambioFechaSuperior() {
-    ejecutarFiltrosCombinados();
-}
-
 function seguraInyeccionHTML(id, contenido) {
     const el = document.getElementById(id);
     if (el) el.innerHTML = contenido;
@@ -625,22 +736,19 @@ function loadFallbackData() {
     poblarDropdownsDeFiltros(totalRecords_Raw);
     ejecutarFiltrosCombinados();
 }
-// Función idéntica al Centro de Control para desplegar los submenús
-window.evtToggleSubmenu = function (event) {
-    event.preventDefault(); // Evita cualquier comportamiento de navegación
-    event.stopPropagation(); // Evita que el click se propague a otros elementos
 
-    // Conseguimos el contenedor del grupo ('menu-item-group')
+window.evtToggleSubmenu = function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+
     const currentGroup = event.currentTarget.closest('.menu-item-group');
 
-    // Cierra los otros menús abiertos para que actúe como acordeón (opcional, igual al portal)
     document.querySelectorAll('.menu-item-group').forEach(group => {
         if (group !== currentGroup) {
             group.classList.remove('open');
         }
     });
 
-    // Alterna la clase 'open' en el menú al que le hiciste click
     if (currentGroup) {
         currentGroup.classList.toggle('open');
     }

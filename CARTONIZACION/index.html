@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avance Cartonización | Antigravity WMS</title>
+    <link rel="stylesheet" href="/CARTONIZACION/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js + Plugin DataLabels -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <div class="sidebar" id="sidebarMenu">
+        <div class="sidebar-brand">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Antigravity WMS</span>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="/index.html"><i class="fa-solid fa-home"></i> Centro de Control</a>
+            <hr style="border: 0.5px solid #2a3b5c; margin: 10px 0;">
+
+            <!-- Dashboard Recepción -->
+            <div class="menu-item-group">
+                <a href="javascript:void(0);" class="has-submenu" onclick="evtToggleSubmenu(event)">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard Recepción <i
+                        class="fa-solid fa-chevron-down arrow-sub"></i>
+                </a>
+                <div class="submenu">
+                    <a href="/AVANCE/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i> Avance
+                        Recepción</a>
+                    <a href="/PRONOSTICO/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Pronóstico Recepción</a>
+                </div>
+            </div>
+
+            <!-- Dashboard Productividad -->
+            <div class="menu-item-group open">
+                <a href="javascript:void(0);" class="has-submenu" onclick="evtToggleSubmenu(event)">
+                    <i class="fa-solid fa-boxes-packing"></i> Dashboard Productividad <i
+                        class="fa-solid fa-chevron-down arrow-sub"></i>
+                </a>
+                <div class="submenu">
+                    <a href="/PRODUCTIVIDAD/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Avance Operarios Individual</a>
+                    <a href="/CARTONIZACION/index.html" class="active"><i class="fa-solid fa-circle-dot"
+                            style="font-size: 8px;"></i> Avance Cartonización</a>
+                    <a href="/GRUPALPROD/index.html"><i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                        Avance Operarios Grupal</a>
+                </div>
+            </div>
+
+            <a href="/AGENDA/index.html"><i class="fa-solid fa-calendar-days"></i> Dashboard Agenda</a>
+            <a href="/INCIDENCIAS/index.html"><i class="fa-solid fa-triangle-exclamation"></i> Dashboard Incidencias</a>
+            <a href="/COMPROMISO/index.html"><i class="fa-solid fa-file-signature"></i> Dashboard Carta de
+                Compromiso</a>
+            <a href="/RESUMEN/index.html"><i class="fa-solid fa-clipboard-list"></i> Resumen Recepción</a>
+        </nav>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="main-content" id="mainContent">
+
+        <header class="main-header">
+            <div class="header-left">
+                <button id="btn-toggle-sidebar" class="btn-toggle"><i class="fa-solid fa-bars"></i></button>
+                <div class="brand">
+                    <h1>AVANCE DE CARTONIZACIÓN</h1>
+                    <p>CEDIS | Módulo de Control de Productividad de Cartonización</p>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="header-filters">
+                    <select id="filter-year" class="hdr-select" onchange="aplicarFiltrosGlobales()">
+                        <option value="TODOS">Año: Todos</option>
+                    </select>
+                    <select id="filter-month" class="hdr-select" onchange="aplicarFiltrosGlobales()">
+                        <option value="TODOS">Mes: Todos</option>
+                        <option value="01">Enero</option>
+                        <option value="02">Febrero</option>
+                        <option value="03">Marzo</option>
+                        <option value="04">Abril</option>
+                        <option value="05">Mayo</option>
+                        <option value="06">Junio</option>
+                        <option value="07">Julio</option>
+                        <option value="08">Agosto</option>
+                        <option value="09">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                </div>
+
+                <div class="connection-badge" id="db-status">
+                    <i class="fa-solid fa-database glow-icon"></i>
+                    <span id="db-status-text">Conectando...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- KPIS TARJETAS SUPERIORES -->
+        <section class="kpi-grid">
+            <div class="kpi-card highlight">
+                <div class="kpi-icon"><i class="fa-solid fa-file-invoice"></i></div>
+                <div class="kpi-info">
+                    <span class="kpi-title">Total ASNs Cartonizadas</span>
+                    <h2 id="kpi-total-asn">0</h2>
+                    <small>Prioridad de Procesamiento</small>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fa-solid fa-users"></i></div>
+                <div class="kpi-info">
+                    <span class="kpi-title">Usuarios Activos</span>
+                    <h2 id="kpi-total-usuarios">0</h2>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+                <div class="kpi-info">
+                    <span class="kpi-title">Total SKUs (Artículos)</span>
+                    <h2 id="kpi-total-skus">0</h2>
+                    <small>Verificados en Packing List</small>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fa-solid fa-sliders"></i></div>
+                <div class="kpi-info">
+                    <span class="kpi-title">Prom. SKUs / ASN</span>
+                    <h2 id="kpi-prom-skus">0</h2>
+                    <small>Índice de Dificultad</small>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE GRÁFICOS INTERACTIVOS EXPANDIBLES -->
+        <section class="charts-grid" id="chartsGrid">
+
+            <!-- GRÁFICO 1: USUARIOS -->
+            <div class="chart-card" id="cardChartUsers">
+                <div class="chart-header">
+                    <div>
+                        <h3><i class="fa-solid fa-trophy"></i> ASNs Cartonizadas por Usuario</h3>
+                        <small>Ranking de productividad directa</small>
+                    </div>
+                    <button class="btn-expand" title="Expandir/Contraer" onclick="toggleExpandChart('cardChartUsers')">
+                        <i class="fa-solid fa-expand" id="icon-cardChartUsers"></i>
+                    </button>
+                </div>
+                <div class="chart-body">
+                    <canvas id="chartUsersAsn"></canvas>
+                </div>
+            </div>
+
+            <!-- GRÁFICO 2: HORAS PICO (MAPA DE CALOR / DISTRIBUCIÓN HORARIA) -->
+            <div class="chart-card" id="cardChartHours">
+                <div class="chart-header">
+                    <div>
+                        <h3><i class="fa-solid fa-clock-rotate-left"></i> Distribución de Cartonización por Hora</h3>
+                        <small>Identificación de horas pico y valles</small>
+                    </div>
+                    <button class="btn-expand" title="Expandir/Contraer" onclick="toggleExpandChart('cardChartHours')">
+                        <i class="fa-solid fa-expand" id="icon-cardChartHours"></i>
+                    </button>
+                </div>
+                <div class="chart-body">
+                    <canvas id="chartHoursAsn"></canvas>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- SECCIÓN DE TABLA DETALLADA -->
+        <section class="table-section">
+            <div class="table-title">
+                <div class="title-left">
+                    <h3>Detalle de Registros Cartonizados</h3>
+                    <select id="filter-user" class="filter-select" onchange="aplicarFiltrosGlobales()">
+                        <option value="TODOS">Todos los usuarios</option>
+                    </select>
+                    <button class="btn-clear" id="btn-clear-filters" onclick="resetearFiltros()"><i
+                            class="fa-solid fa-rotate"></i> Limpiar Filtros</button>
+                </div>
+                <span class="counter-badge" id="table-counter">0 Registros</span>
+            </div>
+
+            <div class="table-overflow">
+                <table id="data-table">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Nro ASN</th>
+                            <th>Proveedor</th>
+                            <th>Nro OC</th>
+                            <th>SKUs (Artículos)</th>
+                            <th>LPNs</th>
+                            <th>Tipo ASN</th>
+                            <th>Fecha/Hora Creación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="8" class="loading-td"><i class="fa-solid fa-sync fa-spin"></i> Conectando con
+                                histórico_recepcion...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="/CARTONIZACION/app.js"></script>
+</body>
+
+</html>

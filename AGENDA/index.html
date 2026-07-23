@@ -13,7 +13,6 @@
 
 <body>
 
-    <!-- BARRA LATERAL IDÉNTICA AL CENTRO DE CONTROL -->
     <div class="sidebar" id="sidebarMenu">
         <div class="sidebar-brand">
             <i class="fa-solid fa-layer-group"></i>
@@ -23,8 +22,6 @@
             <a href="../index.html"><i class="fa-solid fa-home"></i> Centro de Control</a>
             <hr style="border: 0.5px solid #2a3b5c; margin: 10px 0;">
 
-            <!-- Dashboard Recepción con Desplegable -->
-            <!-- Dashboard Recepción con Desplegable -->
             <div class="menu-item-group">
                 <a href="javascript:void(0);" class="has-submenu" onclick="evtToggleSubmenu(event)">
                     <i class="fa-solid fa-chart-line"></i> Dashboard Recepción <i
@@ -38,7 +35,6 @@
                 </div>
             </div>
 
-            <!-- Dashboard Productividad con Desplegable -->
             <div class="menu-item-group">
                 <a href="javascript:void(0);" class="has-submenu" onclick="evtToggleSubmenu(event)">
                     <i class="fa-solid fa-boxes-packing"></i> Dashboard Productividad <i
@@ -60,12 +56,10 @@
             <a href="../COMPROMISO/index.html"><i class="fa-solid fa-file-signature"></i> Dashboard Carta de
                 Compromiso</a>
 
-            <!-- Último elemento -->
             <a href="../RESUMEN/index.html"><i class="fa-solid fa-clipboard-list"></i> Resumen Recepción</a>
         </nav>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL DE LA AGENDA -->
     <div class="main-content" id="mainContent">
 
         <header class="main-header">
@@ -250,6 +244,21 @@
                 </table>
             </div>
         </section>
+    </div>
+
+    <!-- VENTANA FLOTANTE (MODAL) INCIDENCIAS NO VINO -->
+    <div id="modal-incidencias" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-user-slash" style="color: #EF4444;"></i> Proveedores 'NO VINO' - <span
+                        id="modal-fecha-titulo"></span></h3>
+                <button class="btn-close-modal" onclick="cerrarModalIncidencias()"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="modal-cards-container">
+                <!-- Se inyectan las tarjetas parpadeantes dinámicamente -->
+            </div>
+        </div>
     </div>
 
     <script src="/AGENDA/app.js"></script>

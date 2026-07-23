@@ -269,7 +269,7 @@ function actualizarTarjetasKPI(datosFiltrados) {
     document.getElementById('kpi-confiabilidad').textContent = `${Math.max(0, Math.min(100, otif)).toFixed(1)}%`;
 }
 
-// 1º GRÁFICO: LÍNEA TEMPORAL
+// 1º GRÁFICO: LÍNEA TEMPORAL (CORREGIDO SIN RECORTE DE DÍAS)
 function renderizarGraficoTemporal(datosFiltrados) {
     const agrupado = {};
     datosFiltrados.forEach(i => {
@@ -279,7 +279,8 @@ function renderizarGraficoTemporal(datosFiltrados) {
         }
     });
 
-    const labels = Object.keys(agrupado).sort((a, b) => new Date(a) - new Date(b)).slice(-10);
+    // Eliminamos el .slice(-10) para que tome TODAS las fechas disponibles
+    const labels = Object.keys(agrupado).sort((a, b) => new Date(a) - new Date(b));
     const valores = labels.map(l => agrupado[l]);
 
     if (chartTemporalInstance) chartTemporalInstance.destroy();
